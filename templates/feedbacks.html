@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Feedbacks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Submitted Feedbacks</h1>
+        {% if feedbacks %}
+            <ul>
+                {% for fb in feedbacks %}
+                    <li>
+                        <strong>{{ fb.name }}</strong> ({{ fb.subject }}) rated <b>{{ fb.rating }}/5</b><br>
+                        <em>{{ fb.comments }}</em>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No feedback submitted yet.</p>
+        {% endif %}
+        <a href="/">Go Back</a>
+    </div>
+</body>
+</html>
