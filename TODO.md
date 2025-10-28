@@ -1,19 +1,19 @@
 # Deployment Plan for Student Feedback Portal to Azure AKS
 
 ## Phase 1: Source Code and Version Control
-- [ ] Update requirements.txt to add gunicorn
-- [ ] Execute git add .
-- [ ] Execute git commit -m "Phase 1: Add gunicorn, requirements.txt, and update app.py for containerization"
-- [ ] Execute git push origin main
+- [x] Update requirements.txt to add gunicorn
+- [x] Execute git add .
+- [x] Execute git commit -m "Phase 1: Add gunicorn, requirements.txt, and update app.py for containerization"
+- [x] Execute git push origin main
 
 ## Phase 2: Containerization
-- [ ] Create Dockerfile
-- [ ] Execute docker build -t feedback-app:latest .
-- [ ] Execute docker run -d -p 8080:8080 --name feedback-test feedback-app:latest
-- [ ] Execute docker logs feedback-test
-- [ ] Execute docker ps
-- [ ] Execute docker stop feedback-test
-- [ ] Execute docker rm feedback-test
+- [x] Create Dockerfile
+- [x] Execute docker build -t feedback-app:latest .
+- [x] Execute docker run -d -p 8080:8080 --name feedback-test feedback-app:latest
+- [x] Execute docker logs feedback-test
+- [x] Execute docker ps
+- [x] Execute docker stop feedback-test
+- [x] Execute docker rm feedback-test
 
 ## Phase 3: Infrastructure Provisioning (IaC)
 - [ ] Execute mkdir terraform
