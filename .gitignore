@@ -8,3 +8,5 @@
 *.tfstate.backup
 *.exe
 terraform/tfplan
+terraform/*.tfstate*
+.terraform/
