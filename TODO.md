@@ -16,12 +16,12 @@
 - [x] Execute docker rm feedback-test
 
 ## Phase 3: Infrastructure Provisioning (IaC)
-- [ ] Execute mkdir terraform
-- [ ] Execute cd terraform
-- [ ] Create terraform/variables.tf
-- [ ] Create terraform/main.tf
-- [ ] Create terraform/outputs.tf
-- [ ] Execute az login
+- [x] Execute mkdir terraform
+- [x] Execute cd terraform
+- [x] Create terraform/variables.tf
+- [x] Create terraform/main.tf
+- [x] Create terraform/outputs.tf
+- [ ] Execute az login (Azure CLI installed, waiting for login)
 - [ ] Execute terraform init
 - [ ] Execute terraform plan
 - [ ] Execute terraform apply --auto-approve
@@ -31,18 +31,18 @@
 - [ ] Execute docker push samuelmdevopsacr.azurecr.io/feedback-app:latest
 
 ## Phase 4: Configuration Management
-- [ ] Execute mkdir k8s
-- [ ] Execute mkdir ansible
-- [ ] Create k8s/deployment.yaml
-- [ ] Create k8s/service.yaml
-- [ ] Create ansible/deploy.yml
+- [x] Execute mkdir k8s
+- [x] Execute mkdir ansible
+- [x] Create k8s/deployment.yaml
+- [x] Create k8s/service.yaml
+- [x] Create ansible/deploy.yml
 
 ## Phase 5: CI/CD Pipeline Setup (GitHub Actions)
-- [ ] Execute mkdir -p .github/workflows
-- [ ] Create .github/workflows/main.yml
-- [ ] Execute git add .
-- [ ] Execute git commit -m "Phase 5: Add Terraform output, K8s manifests, Ansible playbook, and GitHub Actions CI/CD"
-- [ ] Execute git push origin main
+- [x] Execute mkdir -p .github/workflows
+- [x] Create .github/workflows/main.yml
+- [x] Execute git add .
+- [x] Execute git commit -m "Phase 5: Add Terraform output, K8s manifests, Ansible playbook, and GitHub Actions CI/CD"
+- [x] Execute git push origin main
 
 ## Phase 6: Deployment and Validation
 - [ ] Monitor GitHub Actions pipeline
