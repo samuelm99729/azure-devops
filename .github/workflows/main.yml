@@ -31,33 +31,34 @@ jobs:
       run: |
         docker build -t feedback-app:${{ github.sha }} .
 
-    - name: Login to Azure Container Registry
+    # ✅ Login using Service Principal
+    - name: Log in to Azure Container Registry
       uses: azure/docker-login@v1
       with:
-        login-server: samuelmdevopsacr.azurecr.io
-        username: ${{ secrets.ACR_USERNAME }}
-        password: ${{ secrets.ACR_PASSWORD }}
+        login-server: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io
+        username: ${{ secrets.AZURE_CLIENT_ID }}
+        password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
     - name: Push Docker image to ACR
       run: |
-        docker tag feedback-app:${{ github.sha }} samuelmdevopsacr.azurecr.io/feedback-app:${{ github.sha }}
-        docker push samuelmdevopsacr.azurecr.io/feedback-app:${{ github.sha }}
+        docker tag feedback-app:${{ github.sha }} ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}
+        docker push ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}
 
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Deploy to AKS
+    - name: Set AKS Context
       uses: azure/aks-set-context@v3
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         cluster-name: aks-devops-project
         resource-group: rg-devops-project-iac
 
-    - name: Update Kubernetes deployment
+    - name: Deploy to AKS
       run: |
-        sed -i 's|samuelmdevopsacr.azurecr.io/feedback-app:latest|samuelmdevopsacr.azurecr.io/feedback-app:${{ github.sha }}|g' k8s/deployment.yaml
+        sed -i 's|samuelmdevopsacr.azurecr.io/feedback-app:latest|${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}|g' k8s/deployment.yaml
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
         kubectl rollout status deployment/feedback-app-deployment

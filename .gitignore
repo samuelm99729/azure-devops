@@ -3,3 +3,8 @@
 *.tfstate.backup
 *.exe
 *.zip
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.exe
+terraform/tfplan
