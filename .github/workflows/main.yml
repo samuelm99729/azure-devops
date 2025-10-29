@@ -48,7 +48,9 @@ jobs:
     - name: Push Docker image to ACR
       run: |
         docker tag feedback-app:${{ github.sha }} ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}
+        docker tag feedback-app:${{ github.sha }} ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:latest
         docker push ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}
+        docker push ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:latest
 
     # 8️⃣ Login to Azure
     - name: Login to Azure
@@ -67,7 +69,13 @@ jobs:
     # 🔟 Deploy updated image to AKS
     - name: Deploy to AKS
       run: |
+        # Replace old image with the new one based on commit SHA
         sed -i 's|samuelmdevopsacr.azurecr.io/feedback-app:latest|${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}|g' k8s/deployment.yaml
+
+        # Apply changes to Kubernetes
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
+
+        # Restart deployment to pull the new image
+        kubectl rollout restart deployment/feedback-app-deployment
         kubectl rollout status deployment/feedback-app-deployment
