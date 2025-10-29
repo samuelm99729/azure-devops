@@ -15,5 +15,6 @@ spec:
       containers:
       - name: feedback-app
         image: samuelmdevopsacr.azurecr.io/feedback-app:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
