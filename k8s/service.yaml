@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: feedback-app-service
 spec:
-  type: LoadBalancer
   selector:
     app: feedback-app
+  type: LoadBalancer
   ports:
-  - port: 80
-    targetPort: 8000
+    - port: 80          # external port (what users access)
+      targetPort: 8080  # internal Gunicorn port

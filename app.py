@@ -39,4 +39,6 @@ def health_check():
     This route is tested by tests/test_health.py. hi
     """
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
 
