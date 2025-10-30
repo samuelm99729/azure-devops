@@ -33,6 +33,7 @@ jobs:
 
     # 5️⃣ Define short image tag from commit SHA
     - name: Set image tag
+    # ✅ This creates a short tag like `3a9d5c2`
       id: vars
       run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
@@ -71,10 +72,7 @@ jobs:
     # 1️⃣1️⃣ Deploy to AKS
     - name: Deploy to AKS
       run: |
-        echo "Deploying image tag: ${TAG}"
-        # Update deployment with the new image tag
+        # ✅ Use the same short TAG as before
         kubectl set image deployment/feedback-app-deployment feedback-app=${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${TAG} --record
-        # Apply service again (safe)
         kubectl apply -f k8s/service.yaml
-        # Wait for rollout
         kubectl rollout status deployment/feedback-app-deployment
