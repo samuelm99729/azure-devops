@@ -66,16 +66,16 @@ jobs:
         cluster-name: feedback-aks
         subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    # 🔟 Deploy updated image to AKS
+  # 🔟 Deploy updated image to AKS
     - name: Deploy to AKS
       run: |
-        # Replace old image with the new one based on commit SHA
-        sed -i 's|samuelmdevopsacr.azurecr.io/feedback-app:latest|${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}|g' k8s/deployment.yaml
+        # Update deployment with the new image directly
+        kubectl set image deployment/feedback-app-deployment \
+          feedback-app=${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}
 
-        # Apply changes to Kubernetes
-        kubectl apply -f k8s/deployment.yaml
+        # Apply service (safe to reapply even if unchanged)
         kubectl apply -f k8s/service.yaml
 
-        # Restart deployment to pull the new image
-        kubectl rollout restart deployment/feedback-app-deployment
+        # Wait for rollout completion
         kubectl rollout status deployment/feedback-app-deployment
+
