@@ -8,4 +8,4 @@ spec:
   type: LoadBalancer
   ports:
     - port: 80          # external port (what users access)
-      targetPort: 8080  # internal Gunicorn port
+      targetPort: 8000  # internal Gunicorn port
