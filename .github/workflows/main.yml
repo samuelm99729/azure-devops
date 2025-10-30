@@ -36,7 +36,7 @@ jobs:
       run: |
         docker build -t feedback-app:${{ github.sha }} .
 
-    # 6️⃣ Login to Azure Container Registry
+    # 6️⃣ Login to Azure Container Registry (ACR)
     - name: Log in to Azure Container Registry
       uses: azure/docker-login@v1
       with:
@@ -58,7 +58,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # 9️⃣ Set AKS context (using your existing cluster)
+    # 9️⃣ Set AKS context (connect GitHub runner to your AKS cluster)
     - name: Set AKS Context
       uses: azure/aks-set-context@v3
       with:
@@ -66,16 +66,19 @@ jobs:
         cluster-name: feedback-aks
         subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  # 🔟 Deploy updated image to AKS
+    # 🔟 Deploy updated image to AKS
     - name: Deploy to AKS
       run: |
-        # Update deployment with the new image directly
+        echo "🚀 Updating AKS deployment with new image tag: ${{ github.sha }}"
+
+        # Update deployment image to the new build
         kubectl set image deployment/feedback-app-deployment \
           feedback-app=${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ github.sha }}
 
-        # Apply service (safe to reapply even if unchanged)
+        # Re-apply the service (in case it was changed)
         kubectl apply -f k8s/service.yaml
 
-        # Wait for rollout completion
+        # Wait for rollout to finish
         kubectl rollout status deployment/feedback-app-deployment
 
+        echo "✅ Deployment updated successfully!"
