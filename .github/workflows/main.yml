@@ -68,17 +68,20 @@ jobs:
         cluster-name: feedback-aks
         subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    # 1️⃣1️⃣ Deploy to AKS
+    # 1️⃣1️⃣ Deploy to AKS (Automatic update)
     - name: Deploy to AKS
       run: |
-        # ✅ Update image in AKS deployment
+        echo "Deploying image tag: ${TAG}"
+        
+        # ✅ Update the deployment with the new image tag
         kubectl set image deployment/feedback-app-deployment feedback-app=${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${TAG} --record
         
-        # ✅ Apply the service configuration
-        kubectl apply -f k8s/service.yaml
-
-        # ✅ Ensure rollout completes successfully
+        # ✅ Wait for rollout to complete
         kubectl rollout status deployment/feedback-app-deployment
-
-        # ✅ Force restart to ensure the latest image is pulled
+        
+        # ✅ Restart to force pull latest image version
         kubectl rollout restart deployment/feedback-app-deployment
+        
+        # ✅ Confirm the running image tag in AKS
+        echo "Current image running in AKS:"
+        kubectl get deployment feedback-app-deployment -o=jsonpath='{.spec.template.spec.containers[*].image}'
