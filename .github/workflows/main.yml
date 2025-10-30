@@ -34,12 +34,13 @@ jobs:
     # 5️⃣ Define short image tag from commit SHA
     - name: Set image tag
       id: vars
-      run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+      run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
     # 6️⃣ Build Docker image
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${TAG} .
+        echo "Building image with tag: ${{ steps.vars.outputs.TAG }}"
+        docker build -t ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ steps.vars.outputs.TAG }} .
 
     # 7️⃣ Login to Azure Container Registry
     - name: Log in to Azure Container Registry
@@ -52,7 +53,8 @@ jobs:
     # 8️⃣ Push Docker image to ACR
     - name: Push Docker image to ACR
       run: |
-        docker push ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${TAG}
+        echo "Pushing image tag: ${{ steps.vars.outputs.TAG }}"
+        docker push ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ steps.vars.outputs.TAG }}
 
     # 9️⃣ Login to Azure
     - name: Login to Azure
@@ -68,20 +70,20 @@ jobs:
         cluster-name: feedback-aks
         subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    # 1️⃣1️⃣ Deploy to AKS (Automatic update)
+    # 1️⃣1️⃣ Deploy to AKS
     - name: Deploy to AKS
       run: |
-        echo "Deploying image tag: ${TAG}"
+        echo "Deploying image: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ steps.vars.outputs.TAG }}"
         
-        # ✅ Update the deployment with the new image tag
-        kubectl set image deployment/feedback-app-deployment feedback-app=${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${TAG} --record
-        
-        # ✅ Wait for rollout to complete
+        # ✅ Ensure imagePullPolicy is Always (applied via patch)
+        kubectl patch deployment feedback-app-deployment \
+          -p '{"spec":{"template":{"spec":{"containers":[{"name":"feedback-app","imagePullPolicy":"Always"}]}}}}'
+
+        # ✅ Update image with new tag
+        kubectl set image deployment/feedback-app-deployment feedback-app=${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/feedback-app:${{ steps.vars.outputs.TAG }}
+
+        # ✅ Apply service config (safe to reapply)
+        kubectl apply -f k8s/service.yaml
+
+        # ✅ Wait for rollout completion
         kubectl rollout status deployment/feedback-app-deployment
-        
-        # ✅ Restart to force pull latest image version
-        kubectl rollout restart deployment/feedback-app-deployment
-        
-        # ✅ Confirm the running image tag in AKS
-        echo "Current image running in AKS:"
-        kubectl get deployment feedback-app-deployment -o=jsonpath='{.spec.template.spec.containers[*].image}'
